@@ -2,14 +2,12 @@ name "zipper"
 description "D wrapper around libzip"
 authors "Dmytro Katyukha"
 copyright "Copyright © 2023, Dmytro Katyukha"
-license "proprietary"
+license "MPL-2.0"
 targetType "library"
 targetPath "build"
 
-systemDependencies "libzip"
-libs "zip"
-
-dependency "thepath" version="~>0.1.7"
+dependency "thepath" version=">=0.1.7"
+dependency "dlibzip" version="~>1.9.2"
 
 configuration "library" {
 }

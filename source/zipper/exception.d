@@ -3,9 +3,10 @@ module zipper.exception;
 private import std.exception: enforce, basicExceptionCtors;
 private import std.string: fromStringz;
 
-private import zipper.deimos.zip;
+private import deimos.zip;
 
 
+/// Base exception class for Zipper errors
 class ZipException : Exception
 {
     mixin basicExceptionCtors;
@@ -19,9 +20,9 @@ class ZipException : Exception
   * Returns:
   *     string that contains error message
   **/
-package string format_zip_error(int error_code) {
+package string format_zip_error(int error_code) @trusted {
     zip_error_t error;
     zip_error_init_with_code(&error, error_code);
     scope(exit) zip_error_fini(&error);
-    return cast(string)zip_error_strerror(&error).fromStringz;
+    return zip_error_strerror(&error).fromStringz.idup;
 }

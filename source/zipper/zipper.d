@@ -8,7 +8,7 @@ private import std.algorithm.searching: endsWith, startsWith;
 
 private import thepath: Path;
 
-private import zipper.deimos.zip;
+private import deimos.zip;
 
 private import zipper;
 private import zipper.entry;
@@ -16,6 +16,7 @@ private import zipper.internal;
 private import zipper.exception;
 
 
+/// Use this struct to deal with zip archives
 struct Zipper {
 
     private:

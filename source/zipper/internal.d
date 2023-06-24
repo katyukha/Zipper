@@ -43,14 +43,15 @@ package:
 
         zip_t* zip_ptr() { return _zip_ptr; }
 
-        // getErrorMsg
-        auto getErrorMsg() {
+        /// Get human-readable representation of last error in archive.
+        public auto getErrorMsg() {
             auto error_msg = zip_error_strerror(
                 zip_get_error(_zip_ptr)
-            ).fromStringz;
+            ).fromStringz.idup;
             return error_msg;
         }
 
+        /// Close Zip archive
         void close() {
             if (zip_close(_zip_ptr) != 0) {
                 auto error_msg = getErrorMsg();

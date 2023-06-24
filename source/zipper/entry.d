@@ -30,7 +30,7 @@ struct ZipEntryStat {
         @disable this();
 
         this(scope const ref zip_stat_t stat) {
-            _name = (cast(string)fromStringz(stat.name)).strip("/", "");
+            _name = fromStringz(stat.name).idup.strip("/", "");
             _index = stat.index;
             _size = stat.size;
             _compressed_size = stat.comp_size;
@@ -90,8 +90,7 @@ struct ZipEntry {
                 "Cannot get stat for entry %s [%s] in zip archive: %s".format(
                     _name,
                     _index,
-                    zip_error_strerror(
-                        zip_get_error(_zip_ptr.zip_ptr)).fromStringz));
+                    _zip_ptr.getErrorMsg));
             _stat = ZipEntryStat(e_stat).nullable;
         }
         return _stat.get;
@@ -110,8 +109,7 @@ struct ZipEntry {
             enforce!ZipException(
                 attr_result == 0,
                 "Cannot get external file attrubutes for entry %s [%s] in zip archive: %s".format(
-                    _name, _index,
-                    zip_error_strerror(zip_get_error(_zip_ptr.zip_ptr)).fromStringz));
+                    _name, _index, _zip_ptr.getErrorMsg));
 
             if (entry_opsys == ZIP_OPSYS_UNIX) {
                 entry_attributes = entry_attributes >> 16;

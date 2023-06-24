@@ -220,12 +220,10 @@ struct Zipper {
             enforce!ZipException(
                 entry_path.exists(),
                 "Cannot add file %s: does not exists!".format(entry_path));
-            auto zpath = entry_path.toStringz;
-            auto zname = name.toStringz;
             auto source = zip_source_file(
-                _zip_ptr.zip_ptr, zpath, 0, 0);
+                _zip_ptr.zip_ptr, entry_path.toStringz, 0, 0);
             auto entry_index = zip_file_add(
-                _zip_ptr.zip_ptr, zname, source,
+                _zip_ptr.zip_ptr, name.toStringz, source,
                 ZIP_FL_OVERWRITE | ZIP_FL_ENC_GUESS);
             enforce!ZipException(
                 entry_index >=0,
@@ -347,3 +345,30 @@ unittest {
         Path("test-data", "odoo.test.2.log").readFileText());
 }
 
+/// Test creation of archive, when one of items to be added removed before
+/// archive closed (changes commited)
+unittest {
+    import unit_threaded.assertions;
+    import thepath: createTempPath;
+
+    Path temp_root = createTempPath("test-zip");
+    scope(exit) temp_root.remove();
+
+    temp_root.join("test-disapearing-item.txt").writeFile("Hello world!");
+
+    () {
+        // Do it in subscope to ensure that zip file closed when out of scope
+        auto zip = Zipper(temp_root.join("my.zip"), ZipMode.CREATE);
+        zip.addEntryDirectory("test-data");
+        zip.addEntryFile(
+            Path("test-data", "addons-list.txt"),
+            "test-data/addons-list.txt");
+
+        zip.addEntryFile(
+            temp_root.join("test-disapearing-item.txt"),
+            "test-data/test-disapearing-item.txt");
+
+        temp_root.join("test-disapearing-item.txt").remove;
+
+    }().shouldThrow!ZipException;
+}

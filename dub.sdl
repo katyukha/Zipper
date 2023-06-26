@@ -14,5 +14,6 @@ configuration "library" {
 
 configuration "unittest" {
     dependency "unit-threaded:assertions" version=">=2.0.0"
+    versions "ZipperEnableLogger"
 }
 

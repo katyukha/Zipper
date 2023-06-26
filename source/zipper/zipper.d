@@ -1,5 +1,6 @@
 module zipper.zipper;
 
+version(ZipperEnableLogger) private import std.logger;
 private import std.typecons;
 private import std.exception: enforce;
 private import std.algorithm: canFind;
@@ -200,6 +201,8 @@ struct Zipper {
           *     ZipEntry that represents created directory
           **/
         ZipEntry addEntryDirectory(in string name) {
+            version(ZipperEnableLogger)
+                infof("Adding directory %s into zip archive...", name);
             auto entry_index = zip_dir_add(
                 _zip_ptr.zip_ptr, name.toStringz, ZIP_FL_ENC_GUESS);
             enforce!ZipException(
@@ -219,6 +222,10 @@ struct Zipper {
           *     ZipEntry that represents created file
           **/
         ZipEntry addEntryFile(in Path entry_path, in string name) {
+            version(ZipperEnableLogger)
+                infof(
+                    "Adding file %s as %s into zip archive...",
+                    entry_path, name);
             enforce!ZipException(
                 entry_path.exists(),
                 "Cannot add file %s: does not exists!".format(entry_path));
@@ -241,18 +248,22 @@ struct Zipper {
           *     prefix = prefix to add to files or directories before adding
           *         to archive
           **/
-        void add(in Path path, in string prefix) {
+        auto ref add(in Path path, in string prefix) {
             enforce!ZipException(
                 !prefix.canFind("/"),
                 "'/' in prefix is not supported in current version!");
-            if (prefix.length > 0)
+            if (prefix.length > 0 && !hasEntry(prefix ~ "/"))
                 addEntryDirectory(prefix);
 
             if (path.isFile) {
                 enforce!ZipException(
                     !path.isSymlink,
                     "Archiving symlinks is not supported yet!");
-                addEntryFile(path, path.baseName);
+                addEntryFile(
+                    path,
+                    prefix.length > 0 ?
+                        prefix ~ "/" ~ path.baseName :
+                        path.baseName);
             } else {
                 const auto root_path = path.toAbsolute;
                 foreach(p; root_path.walkBreadth) {
@@ -269,10 +280,11 @@ struct Zipper {
                         addEntryFile(p, name);
                 }
             }
+            return this;
         }
 
         /// ditto
-        void add(in Path path) {
+        auto ref add(in Path path) {
             auto prefix = path.isDir ? path.baseName : "";
             return add(path, prefix);
         }
@@ -451,7 +463,7 @@ unittest {
 }
 
 
-/// Example of creation of archive from single file
+/// Example of creation of archive from files
 unittest {
     import unit_threaded.assertions;
     import thepath: createTempPath;
@@ -461,14 +473,47 @@ unittest {
 
     {
         // Do it in subscope to ensure that zip file closed when out of scope
-        auto zip = Zipper(temp_root.join("my.zip"), ZipMode.CREATE);
-        zip.add(Path("test-data", "addons-list.txt"));
+        Zipper(temp_root.join("my.zip"), ZipMode.CREATE)
+            .add(Path("test-data", "addons-list.txt"))
+            .add(Path("test-data", "odoo.test.2.log"));
     }
 
     auto zip = Zipper(temp_root.join("my.zip"));
-    zip.num_entries.shouldEqual(1);
+    zip.num_entries.shouldEqual(2);
 
     zip.hasEntry("addons-list.txt").shouldBeTrue();
     zip["addons-list.txt"].readFull!char.shouldEqual(
         Path("test-data", "addons-list.txt").readFileText());
+
+    zip.hasEntry("odoo.test.2.log").shouldBeTrue();
+    zip["odoo.test.2.log"].readFull!char.shouldEqual(
+        Path("test-data", "odoo.test.2.log").readFileText());
+}
+
+
+/// Example of creation of archive from files with prefix
+unittest {
+    import unit_threaded.assertions;
+    import thepath: createTempPath;
+
+    Path temp_root = createTempPath("test-zip");
+    scope(exit) temp_root.remove();
+
+    {
+        // Do it in subscope to ensure that zip file closed when out of scope
+        Zipper(temp_root.join("my.zip"), ZipMode.CREATE)
+            .add(Path("test-data", "addons-list.txt"), "my-dir")
+            .add(Path("test-data", "odoo.test.2.log"), "my-dir");
+    }
+
+    auto zip = Zipper(temp_root.join("my.zip"));
+    zip.num_entries.shouldEqual(3);
+
+    zip.hasEntry("my-dir/addons-list.txt").shouldBeTrue();
+    zip["my-dir/addons-list.txt"].readFull!char.shouldEqual(
+        Path("test-data", "addons-list.txt").readFileText());
+
+    zip.hasEntry("my-dir/odoo.test.2.log").shouldBeTrue();
+    zip["my-dir/odoo.test.2.log"].readFull!char.shouldEqual(
+        Path("test-data", "odoo.test.2.log").readFileText());
 }

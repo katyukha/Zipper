@@ -2,7 +2,8 @@ module zipper.zipper;
 
 private import std.typecons;
 private import std.exception: enforce;
-private import std.string: toStringz;
+private import std.algorithm: canFind;
+private import std.string: toStringz, join;
 private import std.format: format;
 private import std.algorithm.searching: endsWith, startsWith;
 
@@ -232,6 +233,49 @@ struct Zipper {
                     name, _zip_ptr.getErrorMsg));
             return entry(entry_index);
         }
+
+        /** Add directory or file to zip archive
+          *
+          * Params:
+          *     path = Path to directory or file to add into zip archive
+          *     prefix = prefix to add to files or directories before adding
+          *         to archive
+          **/
+        void add(in Path path, in string prefix) {
+            enforce!ZipException(
+                !prefix.canFind("/"),
+                "'/' in prefix is not supported in current version!");
+            if (prefix.length > 0)
+                addEntryDirectory(prefix);
+
+            if (path.isFile) {
+                enforce!ZipException(
+                    !path.isSymlink,
+                    "Archiving symlinks is not supported yet!");
+                addEntryFile(path, path.baseName);
+            } else {
+                const auto root_path = path.toAbsolute;
+                foreach(p; root_path.walkBreadth) {
+                    enforce!ZipException(
+                        !p.isSymlink,
+                        "Archiving symlinks is not supported yet!");
+                    const string name = [
+                        prefix,
+                        p.relativeTo(root_path).segments.join("/"),
+                    ].join("/");
+                    if (p.isDir)
+                        addEntryDirectory(name);
+                    else
+                        addEntryFile(p, name);
+                }
+            }
+        }
+
+        /// ditto
+        void add(in Path path) {
+            auto prefix = path.isDir ? path.baseName : "";
+            return add(path, prefix);
+        }
 }
 
 /// Example of analyzing archive
@@ -372,4 +416,59 @@ unittest {
         temp_root.join("test-disapearing-item.txt").remove;
 
     }().shouldThrow!ZipException;
+}
+
+
+/// Example of creation of archive from directory
+unittest {
+    import unit_threaded.assertions;
+    import thepath: createTempPath;
+
+    Path temp_root = createTempPath("test-zip");
+    scope(exit) temp_root.remove();
+
+    {
+        // Do it in subscope to ensure that zip file closed when out of scope
+        auto zip = Zipper(temp_root.join("my.zip"), ZipMode.CREATE);
+        zip.add(Path("test-data"));
+    }
+
+    auto zip = Zipper(temp_root.join("my.zip"));
+    zip.num_entries.shouldEqual(4);
+
+    zip.hasEntry("test-data/").shouldBeTrue();
+    zip["test-data/"].is_directory.shouldBeTrue();
+
+    zip.hasEntry("test-data/addons-list.txt").shouldBeTrue();
+    zip["test-data/addons-list.txt"].readFull!char.shouldEqual(
+        Path("test-data", "addons-list.txt").readFileText());
+
+    zip.hasEntry("test-data/odoo.test.2.log").shouldBeTrue();
+    zip["test-data/odoo.test.2.log"].readFull!char.shouldEqual(
+        Path("test-data", "odoo.test.2.log").readFileText());
+
+    zip.hasEntry("test-data/test-zip.zip").shouldBeTrue();
+}
+
+
+/// Example of creation of archive from single file
+unittest {
+    import unit_threaded.assertions;
+    import thepath: createTempPath;
+
+    Path temp_root = createTempPath("test-zip");
+    scope(exit) temp_root.remove();
+
+    {
+        // Do it in subscope to ensure that zip file closed when out of scope
+        auto zip = Zipper(temp_root.join("my.zip"), ZipMode.CREATE);
+        zip.add(Path("test-data", "addons-list.txt"));
+    }
+
+    auto zip = Zipper(temp_root.join("my.zip"));
+    zip.num_entries.shouldEqual(1);
+
+    zip.hasEntry("addons-list.txt").shouldBeTrue();
+    zip["addons-list.txt"].readFull!char.shouldEqual(
+        Path("test-data", "addons-list.txt").readFileText());
 }

@@ -5,7 +5,7 @@ public import zipper.internal: ZipMode;
 public import zipper.exception: ZipException;
 
 
-private import deimos.zip: zip_libzip_version;
+private import zipper.c: zip_libzip_version;
 
 /// Returns version of libzip library
 string getLibZipVersion() {

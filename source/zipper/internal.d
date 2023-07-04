@@ -4,7 +4,7 @@ private import std.typecons;
 private import std.string: fromStringz;
 private import std.format: format;
 
-private import deimos.zip;
+private import zipper.c;
 
 private import zipper.exception;
 

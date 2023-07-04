@@ -6,8 +6,9 @@ license "MPL-2.0"
 targetType "library"
 targetPath "build"
 
+libs "zip"
+
 dependency "thepath" version=">=0.1.7"
-dependency "dlibzip" version="~>1.9.2"
 
 configuration "library" {
 }

@@ -138,9 +138,6 @@ struct Zipper {
             enforce!ZipException(
                 destination.isValid,
                 "Destination path %s is not valid!".format(destination));
-            enforce!ZipException(
-                !destination.exists,
-                "Destination %s already exists!".format(destination));
 
             // TODO: Add protection for unzipping out of destinantion
 
@@ -160,7 +157,7 @@ struct Zipper {
                 }
             }
 
-            // Create destination directory
+            // Create destination directory if not exists
             dest.mkdir(true);
 
             foreach(entry; this.entries) {
@@ -364,6 +361,46 @@ unittest {
     temp_root.join("res", "test-zip", "test-dir", "test-parent.txt").readLink().shouldEqual(
         Path("..", "test.txt"));
     temp_root.join("res", "test-zip", "test-dir", "test-parent.txt").readFileText().shouldEqual("Test Root\n");
+}
+
+/// Example of unarchiving archive to already existing directory
+unittest {
+    import unit_threaded.assertions;
+    import thepath: createTempPath;
+
+    Path temp_root = createTempPath("test-zip");
+    scope(exit) temp_root.remove();
+
+    Zipper(Path("test-data", "test-zip.zip")).extractTo(temp_root);
+
+    temp_root.join("test-zip").exists().shouldBeTrue();
+    temp_root.join("test-zip").isDir().shouldBeTrue();
+
+    temp_root.join("test-zip", "test.txt").exists().shouldBeTrue();
+    temp_root.join("test-zip", "test.txt").isFile().shouldBeTrue();
+    temp_root.join("test-zip", "test.txt").readFileText().shouldEqual("Test Root\n");
+
+    temp_root.join("test-zip", "test-dir", "test.txt").exists().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test.txt").isFile().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test.txt").readFileText().shouldEqual("Hello World!\n");
+
+    temp_root.join("test-zip", "test-link-1.txt").exists().shouldBeTrue();
+    temp_root.join("test-zip", "test-link-1.txt").isSymlink().shouldBeTrue();
+    temp_root.join("test-zip", "test-link-1.txt").readLink().shouldEqual(
+        Path("test-dir", "test.txt"));
+    temp_root.join("test-zip", "test-link-1.txt").readFileText().shouldEqual("Hello World!\n");
+
+    temp_root.join("test-zip", "test-dir", "test-link.txt").exists().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test-link.txt").isSymlink().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test-link.txt").readLink().shouldEqual(
+        Path("test.txt"));
+    temp_root.join("test-zip", "test-dir", "test-link.txt").readFileText().shouldEqual("Hello World!\n");
+
+    temp_root.join("test-zip", "test-dir", "test-parent.txt").exists().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test-parent.txt").isSymlink().shouldBeTrue();
+    temp_root.join("test-zip", "test-dir", "test-parent.txt").readLink().shouldEqual(
+        Path("..", "test.txt"));
+    temp_root.join("test-zip", "test-dir", "test-parent.txt").readFileText().shouldEqual("Test Root\n");
 }
 
 /// Example of creation of archive

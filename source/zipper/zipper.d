@@ -10,7 +10,7 @@ private import std.algorithm.searching: endsWith, startsWith;
 
 private import thepath: Path;
 
-private import deimos.zip;
+private import zipper.lib;
 
 private import zipper;
 private import zipper.entry;

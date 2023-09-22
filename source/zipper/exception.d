@@ -3,7 +3,7 @@ module zipper.exception;
 private import std.exception: enforce, basicExceptionCtors;
 private import std.string: fromStringz;
 
-private import deimos.zip;
+private import zipper.lib;
 
 
 /// Base exception class for Zipper errors

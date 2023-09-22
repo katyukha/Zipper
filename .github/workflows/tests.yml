@@ -17,6 +17,9 @@ jobs:
           - dmd-2.104.2
           - ldc-latest
           - ldc-1.34.0
+        buildConf:
+          - Static
+          - Dynamic
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -33,10 +36,10 @@ jobs:
           linux: libzip-dev
                       
       - name: Try to build the lib
-        run: dub build
+        run: dub build -c "library${{ matrix.buildConf }}"
 
       - name: Run tests
-        run: dub test -b unittest-cov
+        run: dub test -b unittest-cov -c "unittest${{ matrix.buildConf }}"
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v3

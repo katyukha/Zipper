@@ -299,9 +299,6 @@ alias zip_source_callback = long function(void*, void*, ulong, zip_source_cmd_t)
 alias zip_progress_callback = void function(zip_t*, double, void*);
 alias zip_cancel_callback = int function(zip_t*, void*);
 
-extern (C):
-nothrow:
-
 enum staticBinding = (){
 	version(BindBC_Static)      return true;
 	else version(ZipperStatic) return true;

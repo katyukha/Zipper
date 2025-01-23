@@ -10,16 +10,23 @@ jobs:
           - ubuntu-latest
           - ubuntu-20.04
           - ubuntu-22.04
+          - ubuntu-24.04
           #- windows-latest
-          #- macOS-latest
         dc:
           - dmd-latest
-          - dmd-2.104.2
+          - dmd-2.109.1
           - ldc-latest
-          - ldc-1.34.0
+          - ldc-1.40.0
         buildConf:
           - Static
           - Dynamic
+        include:
+          - os: macOS-latest
+            dc: ldc-1.40.0
+            buildConf: Dynamic
+          - os: macOS-latest
+            dc: ldc-1.40.0
+            buildConf: Static
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -34,6 +41,7 @@ jobs:
         uses: lyricwulf/abc@v1                                                      
         with:                                                                                  
           linux: libzip-dev
+          macos: libzip
                       
       - name: Try to build the lib
         run: dub build -c "library${{ matrix.buildConf }}"

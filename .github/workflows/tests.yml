@@ -1,5 +1,5 @@
 name: Tests
-on: [push, pull_request]
+on: [push]
 
 jobs:
   test:
@@ -42,6 +42,13 @@ jobs:
         with:                                                                                  
           linux: libzip-dev
           macos: libzip
+
+      - name: MacOS check library
+        if: matrix.os == 'macOS-latest'
+        run: |
+          echo "--- --- --- /opt/homebrew/lib ---"
+          ls -l /opt/homebrew/lib/ || true
+          echo "--- --- --- ---"
                       
       - name: Try to build the lib
         run: dub build -c "library${{ matrix.buildConf }}"

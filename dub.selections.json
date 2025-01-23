@@ -3,9 +3,9 @@
 	"versions": {
 		"bindbc-common": "0.1.6",
 		"bindbc-loader": "1.1.5",
-		"dshould": "1.7.1",
+		"dshould": "1.7.2",
 		"prettyprint": "1.0.9",
-		"thepath": "1.2.0",
-		"unit-threaded": "2.1.9"
+		"thepath": "2.0.0",
+		"unit-threaded": "2.2.0"
 	}
 }

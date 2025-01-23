@@ -13,10 +13,7 @@ version(ZipperDynamic) {
 
     private SharedLib lib;
 
-    private enum supportedLibNames = [
-        "libzip.so.4",
-        "libzip.so.5",
-    ];
+    private enum supportedLibNames = mixin(makeLibPaths(["zip", "zip.4", "zip.5"]));
 
     /** Try to load libzip dynamically
       *
@@ -28,15 +25,16 @@ version(ZipperDynamic) {
       **/
     bool loadLibZip(in string libname) {
         lib = bindbc.loader.load(libname.ptr);
-        if (lib == bindbc.loader.invalidHandle)
+        if (lib == bindbc.loader.invalidHandle) {
             return false;
+        }
 
         auto err_count = bindbc.loader.errorCount;
         zipper.lib.libzip.bindModuleSymbols(lib);
         if (bindbc.loader.errorCount == err_count)
-            return false;
+            return true;
 
-        return true;
+        return false;
     }
 
     ///
@@ -55,7 +53,7 @@ version(ZipperDynamic) {
         if (!load_status) {
             auto errors = bindbc.loader.errors[err_count_start .. bindbc.loader.errorCount]
                 .map!((e) => "%s: %s".format(e.error.fromStringz.idup, e.message.fromStringz.idup))
-                .join(", ");
+                .join(",\n");
             assert(0, "Cannot load libzip library! Errors: %s".format(errors));
         }
     }

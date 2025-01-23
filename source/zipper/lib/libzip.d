@@ -308,7 +308,6 @@ enum staticBinding = (){
 
 mixin(joinFnBinds!staticBinding((){
     FnBind[] ret = [
-        /// test
         {q{int}, q{zip_close}, q{zip_t *}},
         {q{int}, q{zip_delete}, q{zip_t *, ulong}},
         {q{long}, q{zip_dir_add}, q{zip_t *, const char *, zip_flags_t}},
@@ -329,7 +328,6 @@ mixin(joinFnBinds!staticBinding((){
         {q{int}, q{zip_fclose}, q{zip_file_t *}},
         {q{zip_t*}, q{zip_fdopen}, q{int, int, int *}},
         {q{long}, q{zip_file_add}, q{zip_t *, const char *, zip_source_t *, zip_flags_t}},
-        {q{void}, q{zip_file_attributes_init}, q{zip_file_attributes_t *}},
         {q{void}, q{zip_file_error_clear}, q{zip_file_t *}},
         {q{int}, q{zip_file_extra_field_delete}, q{zip_t *, ulong, ushort, zip_flags_t}},
         {q{int}, q{zip_file_extra_field_delete_by_id}, q{zip_t *, ulong, ushort, ushort, zip_flags_t}},
@@ -341,11 +339,9 @@ mixin(joinFnBinds!staticBinding((){
         {q{const(char*)}, q{zip_file_get_comment}, q{zip_t *, ulong, uint *, zip_flags_t}},
         {q{zip_error_t*}, q{zip_file_get_error}, q{zip_file_t *}},
         {q{int}, q{zip_file_get_external_attributes}, q{zip_t *, ulong, zip_flags_t, ubyte *, uint *}},
-        {q{int}, q{zip_file_is_seekable}, q{zip_file_t *}},
         {q{int}, q{zip_file_rename}, q{zip_t *, ulong, const char *, zip_flags_t}},
         {q{int}, q{zip_file_replace}, q{zip_t *, ulong, zip_source_t *, zip_flags_t}},
         {q{int}, q{zip_file_set_comment}, q{zip_t *, ulong, const char *, ushort, zip_flags_t}},
-        {q{int}, q{zip_file_set_dostime}, q{zip_t *, ulong, ushort, ushort, zip_flags_t}},
         {q{int}, q{zip_file_set_encryption}, q{zip_t *, ulong, ushort, const char *}},
         {q{int}, q{zip_file_set_external_attributes}, q{zip_t *, ulong, zip_flags_t, ubyte, uint}},
         {q{int}, q{zip_file_set_mtime}, q{zip_t *, ulong, time_t, zip_flags_t}},
@@ -367,7 +363,6 @@ mixin(joinFnBinds!staticBinding((){
         {q{zip_t*}, q{zip_open_from_source}, q{zip_source_t *, int, zip_error_t *}},
 
         {q{int}, q{zip_register_progress_callback_with_state}, q{zip_t *, double, zip_progress_callback , void function(void*), void *}},
-        {q{int}, q{zip_register_cancel_callback_with_state}, q{zip_t *, zip_cancel_callback , void function(void*), void *}},
 
         {q{int}, q{zip_set_archive_comment}, q{zip_t *, const char *, ushort}},
         {q{int}, q{zip_set_archive_flag}, q{zip_t *, zip_flags_t, int}},
@@ -389,10 +384,8 @@ mixin(joinFnBinds!staticBinding((){
         {q{void}, q{zip_source_free}, q{zip_source_t *}},
         {q{zip_source_t*}, q{zip_source_function}, q{zip_t *, zip_source_callback , void *}},
         {q{zip_source_t*}, q{zip_source_function_create}, q{zip_source_callback , void *, zip_error_t *}},
-        {q{int}, q{zip_source_get_file_attributes}, q{zip_source_t *, zip_file_attributes_t *}},
         {q{int}, q{zip_source_is_deleted}, q{zip_source_t *}},
         {q{void}, q{zip_source_keep}, q{zip_source_t *}},
-        //{q{long}, q{zip_source_make_command_bitmap}, q{zip_source_cmd_t, ...}},
         {q{int}, q{zip_source_open}, q{zip_source_t *}},
         {q{long}, q{zip_source_read}, q{zip_source_t *, void *, ulong}},
         {q{void}, q{zip_source_rollback_write}, q{zip_source_t *}},
@@ -403,10 +396,8 @@ mixin(joinFnBinds!staticBinding((){
         {q{long}, q{zip_source_tell}, q{zip_source_t *}},
         {q{long}, q{zip_source_tell_write}, q{zip_source_t *}},
 
-        {q{zip_source_t*}, q{zip_source_window_create}, q{zip_source_t *, ulong, long, zip_error_t *}},
         {q{long}, q{zip_source_write}, q{zip_source_t *, const void *, ulong}},
         {q{zip_source_t*}, q{zip_source_zip}, q{zip_t *, zip_t *, ulong, zip_flags_t, ulong, long}},
-        {q{zip_source_t*}, q{zip_source_zip_create}, q{zip_t *, ulong, zip_flags_t, ulong, long, zip_error_t *}},
         {q{int}, q{zip_stat}, q{zip_t *, const char *, zip_flags_t, zip_stat_t *}},
         {q{int}, q{zip_stat_index}, q{zip_t *, ulong, zip_flags_t, zip_stat_t *}},
         {q{void}, q{zip_stat_init}, q{zip_stat_t *}},
@@ -414,8 +405,6 @@ mixin(joinFnBinds!staticBinding((){
         {q{int}, q{zip_unchange}, q{zip_t *, ulong}},
         {q{int}, q{zip_unchange_all}, q{zip_t *}},
         {q{int}, q{zip_unchange_archive}, q{zip_t *}},
-        {q{int}, q{zip_compression_method_supported}, q{int method, int compress}},
-        {q{int}, q{zip_encryption_method_supported}, q{ushort method, int encode}},
     ];
 
     version(Windows){

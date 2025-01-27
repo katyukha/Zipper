@@ -7,7 +7,7 @@ targetType "library"
 targetPath "build"
 
 dependency "thepath" version=">=1.2.0"
-dependency "bindbc-common" version="~>0.1.6"
+dependency "bindbc-common" version=">=1.0.5"
 
 configuration "libraryStatic" {
     libs "zip"
@@ -15,7 +15,7 @@ configuration "libraryStatic" {
 }
 
 configuration "libraryDynamic" {
-    dependency "bindbc-loader" version="~>1.1.5"
+    dependency "bindbc-loader" version=">=1.1.5"
     versions "ZipperDynamic"
 }
 
@@ -26,7 +26,7 @@ configuration "unittestStatic" {
 }
 
 configuration "unittestDynamic" {
-    dependency "bindbc-loader" version="~>1.1.5"
+    dependency "bindbc-loader" version=">=1.1.5"
     dependency "unit-threaded:assertions" version=">=2.0.0"
     versions "ZipperEnableLogger" "ZipperDynamic"
 }

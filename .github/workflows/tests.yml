@@ -67,5 +67,13 @@ jobs:
       - name: Run tests
         run: dub test -b unittest-cov -c "unittest${{ matrix.buildConf }}"
 
+      - name: Cleanup non-project coverage
+        run: |
+          dub fetch d-cobertura
+          dub run d-cobertura@1.0.0 -- - *.lst
+          rm -f ./*.lst
+
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

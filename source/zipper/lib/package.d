@@ -15,6 +15,11 @@ version(ZipperDynamic) {
 
     private enum supportedLibNames = mixin(makeLibPaths(
         names: ["zip", "zip.4", "zip.5"],
+        platformPaths: [
+            "OSX": [
+                "/usr/local/opt/libzip/lib/",
+            ],
+        ]
     ));
 
     /** Try to load libzip dynamically

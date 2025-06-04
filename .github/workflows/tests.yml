@@ -16,16 +16,34 @@ jobs:
           - dmd-latest
           - dmd-2.109.1
           - ldc-latest
-          - ldc-1.40.0
+          - ldc-1.40.1
         buildConf:
           - Static
           - Dynamic
         include:
+          - os: macOS-13
+            dc: ldc-1.40.1
+            buildConf: Dynamic
+          - os: macOS-13
+            dc: ldc-1.40.1
+            buildConf: Static
+          - os: macOS-14
+            dc: ldc-1.40.1
+            buildConf: Dynamic
+          - os: macOS-14
+            dc: ldc-1.40.1
+            buildConf: Static
+          - os: macOS-15
+            dc: ldc-1.41.0-beta1
+            buildConf: Dynamic
+          - os: macOS-15
+            dc: ldc-1.41.0-beta1
+            buildConf: Static
           - os: macOS-latest
-            dc: ldc-1.40.0
+            dc: ldc-1.40.1
             buildConf: Dynamic
           - os: macOS-latest
-            dc: ldc-1.40.0
+            dc: ldc-1.40.1
             buildConf: Static
 
     runs-on: ${{ matrix.os }}

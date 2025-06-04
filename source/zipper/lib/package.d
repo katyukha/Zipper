@@ -13,7 +13,9 @@ version(ZipperDynamic) {
 
     private SharedLib lib;
 
-    private enum supportedLibNames = mixin(makeLibPaths(["zip", "zip.4", "zip.5"]));
+    private enum supportedLibNames = mixin(makeLibPaths(
+        names: ["zip", "zip.4", "zip.5"],
+    ));
 
     /** Try to load libzip dynamically
       *
